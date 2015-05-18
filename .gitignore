@@ -32,3 +32,8 @@ out/*
 **/out/*
 pom.xml.releaseBackup
 **/pom.xml.releaseBackup
+jgrapht-dist/jgrapht-dist.iml
+jgrapht-core/jgrapht-core.iml
+jgrapht-demo/jgrapht-demo.iml
+jgrapht-ext/jgrapht-ext.iml
+jgrapht.iml
