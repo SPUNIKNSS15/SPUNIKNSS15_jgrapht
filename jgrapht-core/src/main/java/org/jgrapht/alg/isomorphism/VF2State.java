@@ -135,7 +135,13 @@ public abstract class VF2State<V,E>
             addVertex1++;
 
         // check incoming and outgoing edges
-        if (t1BothLen > coreLen && t2BothLen > coreLen) {
+        if (t2BothLen > coreLen) {
+            if (t1BothLen < t2BothLen) {
+                System.out.println(indent +
+                        "nextPair> kein Matching möglich, da Vorgänger und Nachfolger des bisherigen inkompatibel");
+                addVertex1 = addVertex2 = NULL_NODE;
+                return false;
+                }
 
             // find minimum for addVertex2 in core2 and t2in/t2out
             while (addVertex2 < n2 &&
@@ -156,7 +162,14 @@ public abstract class VF2State<V,E>
         }
 
         // check outgoing edges
-        else if (t1OutLen > coreLen && t2OutLen > coreLen) {
+        else if (t2OutLen > coreLen) {
+            if (t1OutLen < t2OutLen) {
+                System.out.println(indent +
+                        "nextPair> kein Matching möglich, da Vorgänger und Nachfolger des bisherigen inkompatibel");
+                addVertex1 = addVertex2 = NULL_NODE;
+                return false;
+            }
+
             while (addVertex2 < n2 &&
                     (core2[addVertex2] != NULL_NODE ||
                      out2[addVertex2] == 0)) {
@@ -172,7 +185,14 @@ public abstract class VF2State<V,E>
         }
 
         // check incoming edges
-        else if (t1InLen > coreLen && t2InLen > coreLen) {
+        else if (t2InLen > coreLen) {
+            if (t1InLen < t2InLen) {
+                System.out.println(indent +
+                        "nextPair> kein Matching möglich, da Vorgänger und Nachfolger des bisherigen inkompatibel");
+                addVertex1 = addVertex2 = NULL_NODE;
+                return false;
+            }
+
             while (addVertex2 < n2 &&
                     (core2[addVertex2] != NULL_NODE ||
                      in2[addVertex2] == 0)) {
