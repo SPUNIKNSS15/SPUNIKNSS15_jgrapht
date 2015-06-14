@@ -14,7 +14,7 @@ import org.jgrapht.graph.DefaultEdge;
 
 public class SubgraphIsomorphismTestUtils
 {
-    private static boolean DEBUG = true;
+    private static boolean DEBUG = false;
 
     public static boolean allMatchingsCorrect(
                     VF2SubgraphIsomorphismInspector<Integer, DefaultEdge> vf2,
