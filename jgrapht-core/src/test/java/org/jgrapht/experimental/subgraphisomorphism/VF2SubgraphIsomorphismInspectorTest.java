@@ -97,9 +97,9 @@ public class VF2SubgraphIsomorphismInspectorTest {
 
         /* graph non-empty, subgraph empty */
         DirectedGraph<Integer, DefaultEdge> g3 =
-                new DefaultDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class),
-                g4 =
-                        new DefaultDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
+            new DefaultDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class),
+                                            g4 =
+            new DefaultDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
 
         g3.addVertex(1);
         g3.addVertex(2);
@@ -151,7 +151,14 @@ public class VF2SubgraphIsomorphismInspectorTest {
 
         VF2SubgraphIsomorphismInspector<Integer, DefaultEdge> vf6 =
                 new VF2SubgraphIsomorphismInspector<Integer, DefaultEdge>(g4, g6);
-        assertEquals("[1=5 2=6 3=7 4=~~]", vf6.next().toString());
+
+        assertEquals(false, vf6.hasNext());
+
+        VF2SubgraphIsomorphismInspector<Integer, DefaultEdge> vf6b =
+                new VF2SubgraphIsomorphismInspector<Integer, DefaultEdge>(g3, g6);
+
+        assertEquals("[1=5 2=6 3=7 4=~~]", vf6b.next().toString());
+
 
         /* graph no edges, subgraph contains edge */
         DirectedGraph<Integer, DefaultEdge> g7 =
@@ -221,6 +228,43 @@ public class VF2SubgraphIsomorphismInspectorTest {
         assertEquals("[1=1 2=2 3=3 4=4 5=5]", vf10.next().toString());
 
 
+                /* complete graphs of different size */
+        DirectedGraph<Integer, DefaultEdge> g11 =
+                new DefaultDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
+
+        g11.addVertex(0);
+        g11.addVertex(1);
+        g11.addVertex(2);
+        g11.addVertex(3);
+        g11.addVertex(4);
+        g11.addVertex(5);
+
+        g11.addEdge(1,2);
+        g11.addEdge(2,3);
+        g11.addEdge(3,1);
+        g11.addEdge(4, 5);
+
+
+        DirectedGraph<Integer, DefaultEdge> g12 =
+                new DefaultDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
+
+        g12.addVertex(6);
+        g12.addVertex(7);
+        g12.addVertex(8);
+        g12.addVertex(9);
+        g12.addVertex(10);
+
+        g12.addEdge(7,6);
+        g12.addEdge(9,8);
+        g12.addEdge(10,9);
+        g12.addEdge(8,10);
+
+        VF2SubgraphIsomorphismInspector<Integer, DefaultEdge> vf13 =
+                new VF2SubgraphIsomorphismInspector<Integer, DefaultEdge>(g11, g12);
+
+        assertEquals("[0=~~ 1=8 2=10 3=9 4=7 5=6]", vf13.next().toString());
+
+
 
     }
 
@@ -287,7 +331,7 @@ public class VF2SubgraphIsomorphismInspectorTest {
         VF2SubgraphIsomorphismInspector<Integer, DefaultEdge> vfs5b =
                 new VF2SubgraphIsomorphismInspector<Integer, DefaultEdge>(sg4, sg5);
 
-        assertEquals(false, vfs5b.next());
+        assertEquals(false, vfs5b.hasNext());
 
 
         /* subgraph with vertices, but no edges */
@@ -301,7 +345,12 @@ public class VF2SubgraphIsomorphismInspectorTest {
         VF2SubgraphIsomorphismInspector<Integer, DefaultEdge> vfs6 =
                 new VF2SubgraphIsomorphismInspector<Integer, DefaultEdge>(sg4, sg6);
 
-        assertEquals("[1=5 2=6 3=7 4=~~]", vfs6.next().toString());
+        assertEquals(false, vfs6.hasNext());
+
+        VF2SubgraphIsomorphismInspector<Integer, DefaultEdge> vfs6b =
+                new VF2SubgraphIsomorphismInspector<Integer, DefaultEdge>(sg3, sg6);
+
+        assertEquals("[1=5 2=6 3=7 4=~~]", vfs6b.next().toString());
 
 
         /* graph no edges, subgraph contains edge */
