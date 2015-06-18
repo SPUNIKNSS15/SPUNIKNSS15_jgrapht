@@ -325,6 +325,128 @@ public abstract class VF2State<V,E>
      */
     public abstract boolean isFeasiblePair();
 
+        int termOutPred1 = 0,
+            termOutPred2 = 0,
+            termInPred1 = 0,
+            termInPred2 = 0,
+            newPred1 = 0,
+            newPred2 = 0,
+            termOutSucc1 = 0,
+            termOutSucc2 = 0,
+            termInSucc1 = 0,
+            termInSucc2 = 0,
+            newSucc1 = 0,
+            newSucc2 = 0;
+
+        // check outgoing edges of addVertex1
+        for (int other1 : g1.getOutEdges(addVertex1)) {
+            if (core1[other1] != NULL_NODE) {
+                int other2 = core1[other1];
+                if (!g2.hasEdge(addVertex2, other2) ||
+                                !areCompatibleEdges(addVertex1, other1,
+                                                    addVertex2, other2))    {
+                    System.out.println(abortmsg);
+                    return false;
+                }
+            } else {
+                if (in1[other1] > 0)
+                    termInSucc1++;
+                if (out1[other1] > 0)
+                    termOutSucc1++;
+                if (in1[other1] == 0 && out1[other1] == 0)
+                    newSucc1++;
+            }
+        }
+
+        // check incoming edges of addVertex1
+        for (int other1 : g1.getInEdges(addVertex1)) {
+            if (core1[other1] != NULL_NODE) {
+                int other2 = core1[other1];
+                if (!g2.hasEdge(other2, addVertex2) ||
+                                !areCompatibleEdges(other1, addVertex1,
+                                                    other2, addVertex2))    {
+                    System.out.println(abortmsg);
+                    return false;
+                }
+            } else {
+                if (in1[other1] > 0)
+                    termInPred1++;
+                if (out1[other1] > 0)
+                    termOutPred1++;
+                if (in1[other1] == 0 && out1[other1] == 0)
+                    newPred1++;
+            }
+        }
+
+        // check outgoing edges of addVertex2
+        for (int other2 : g2.getOutEdges(addVertex2)) {
+            if (core2[other2] != NULL_NODE) {
+                int other1 = core2[other2];
+                if (!g1.hasEdge(addVertex1, other1))    {
+                    System.out.println(abortmsg);
+                    return false;
+                }
+            } else {
+                if (in2[other2] > 0)
+                    termInSucc2++;
+                if (out2[other2] > 0)
+                    termOutSucc2++;
+                if (in2[other2] == 0 && out2[other2] == 0)
+                    newSucc2++;
+            }
+        }
+
+        // check incoming edges of addVertex2
+        for (int other2 : g2.getInEdges(addVertex2)) {
+            if (core2[other2] != NULL_NODE) {
+                int other1 = core2[other2];
+                if (!g1.hasEdge(other1, addVertex1))    {
+                    System.out.println(abortmsg);
+                    return false;
+                }
+            } else {
+                if (in2[other2] > 0)
+                    termInPred2++;
+                if (out2[other2] > 0)
+                    termOutPred2++;
+                if (in2[other2] == 0 && out2[other2] == 0)
+                    newPred2++;
+            }
+        }
+
+        if (termInPred1 >= termInPred2 && termOutPred1 >= termOutPred2 && newPred1 >= newPred2 && termInSucc1 >= termInSucc2 && termOutSucc1 >= termOutSucc2 && newSucc1 >= newSucc2) {
+            System.out.println(indent + "isFeasiblePair> " + pairstr + " passt");
+            return true;
+<<<<<<< HEAD
+        } else {
+            System.out.println(abortmsg);
+=======
+        }
+        else
+        {
+            String cause = "",
+                   v1 = g1.getVertex(addVertex1).toString(),
+                   v2 = g2.getVertex(addVertex2).toString();
+        
+            if (termInPred2 > termInPred1)
+                cause = "|Tin2 ∩ Pred(Graph2, " + v2 + ")| > |Tin1 ∩ Pred(Graph1, " + v1 + ")|";
+            else if (termOutPred2 > termOutPred1)
+                cause = "|Tout2 ∩ Pred(Graph2, " + v2 + ")| > |Tout1 ∩ Pred(Graph1, " + v1 + ")|";
+            else if (newPred2 > newPred2)
+                cause = "|N‾ ∩ Pred(Graph2, " + v2 + ")| > |N‾ ∩ Pred(Graph1, " + v1 + ")|";
+            else if (termInPred2 > termInPred1)
+                cause = "|Tin2 ∩ Succ(Graph2, " + v2 + ")| > |Tin1 ∩ Succ(Graph1, " + v1 + ")|";
+            else if (termOutSucc2 > termOutSucc1)
+                cause = "|Tout2 ∩ Succ(Graph2, " + v2 + ")| > |Tout1 ∩ Succ(Graph1, " + v1 + ")|";
+            else if (newSucc2 > newSucc2)
+                cause = "|N‾ ∩ Succ(Graph2, " + v2 + ")| > |N‾ ∩ Succ(Graph1, " + v1 + ")|";
+            
+            System.out.println(abortmsg + ": " + cause);
+>>>>>>> 0f84a6e... replaced cast with "toString"
+            return false;
+        }
+    }
+
     /**
      * removes the last added pair from the matching
      */
