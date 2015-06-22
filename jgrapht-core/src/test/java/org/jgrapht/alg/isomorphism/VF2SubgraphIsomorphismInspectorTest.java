@@ -1155,6 +1155,7 @@ public class VF2SubgraphIsomorphismInspectorTest {
                          ", |E2| = " + g2.edgeSet().size() +
                          " - " + (System.currentTimeMillis() - time) + "ms");
     }
+}
 
 
 
