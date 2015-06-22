@@ -24,6 +24,7 @@ public class VF2SubgraphMappingIterator<V,E>
         if (stateStack.isEmpty()) {
             s = new VF2SubgraphIsomorphismState<V, E>(ordering1, ordering2,
                             vertexComparator, edgeComparator);
+            if (s.n1<s.n2) return null;
 
             if (ordering2.getGraph().vertexSet().isEmpty())
                 return hadOneMapping != null ? null : s.getCurrentMapping();

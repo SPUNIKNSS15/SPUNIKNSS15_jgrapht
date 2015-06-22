@@ -1162,97 +1162,49 @@ public class VF2SubgraphIsomorphismInspectorTest {
     @Test
     public void testSpecialCase() {
 
-        SimpleGraph<Integer, DefaultEdge> g3 =
-                new SimpleGraph<Integer, DefaultEdge>(DefaultEdge.class);
+        ListenableUndirectedGraph<Integer, DefaultEdge> gem = new ListenableUndirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
+        gem.addVertex(0);
+        gem.addVertex(1);
+        gem.addVertex(2);
+        gem.addVertex(3);
+        gem.addVertex(4);
+        gem.addEdge(0, 1);
+        gem.addEdge(0, 4);
+        gem.addEdge(1, 2);
+        gem.addEdge(1, 4);
+        gem.addEdge(2, 3);
+        gem.addEdge(2, 4);
+        gem.addEdge(3, 4);
 
-        g3.addVertex(0);
-        g3.addVertex(1);
-        g3.addVertex(2);
-        g3.addVertex(3);
-        g3.addVertex(4);
-        g3.addVertex(5);
-
-        g3.addEdge(0, 1);
-        g3.addEdge(1, 2);
-        g3.addEdge(2, 3);
-        g3.addEdge(3, 4);
-        g3.addEdge(5, 2);
-        g3.addEdge(5, 3);
-        g3.addEdge(5, 4);
-
-        SimpleGraph<Integer, DefaultEdge> g4 =
-                new SimpleGraph<Integer, DefaultEdge>(DefaultEdge.class);
-
-        g4.addVertex(0);
-        g4.addVertex(1);
-        g4.addVertex(2);
-        g4.addVertex(3);
-        g4.addVertex(4);
-        g4.addVertex(5);
-
-        g4.addEdge(0, 1);
-        g4.addEdge(1, 2);
-        g4.addEdge(2, 3);
-        g4.addEdge(4, 2);
-        g4.addEdge(5, 2);
-        g4.addEdge(5, 3);
-        g4.addEdge(4, 5);
-
-        VF2SubgraphIsomorphismInspector<Integer, DefaultEdge> vfs2 =
-                new VF2SubgraphIsomorphismInspector<Integer, DefaultEdge>
-                        (g3, g4);
-
-        assertEquals(false, vfs2.isomorphismExists());
+        ListenableUndirectedGraph<Integer, DefaultEdge> gemUK1 = new ListenableUndirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
+        gemUK1.addVertex(0);
+        gemUK1.addVertex(1);
+        gemUK1.addVertex(2);
+        gemUK1.addVertex(3);
+        gemUK1.addVertex(4);
+        gemUK1.addVertex(5);
+        gemUK1.addEdge(4, 2);
+        gemUK1.addEdge(2, 0);
+        gemUK1.addEdge(0, 1);
+        gemUK1.addEdge(1, 3);
+        gemUK1.addEdge(3, 4);
+        gemUK1.addEdge(4, 0);
+        gemUK1.addEdge(1, 4);
 
 
-        ListenableUndirectedGraph<Integer, DefaultEdge> g5 =
-                new ListenableUndirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
+        /*** does not fail ***/
+        VF2SubgraphIsomorphismInspector vfspec = new VF2SubgraphIsomorphismInspector<Integer, DefaultEdge>(gemUK1, gem);
+        Iterator<IsomorphicGraphMapping<String, Integer>> iter =
+                vfspec.getMappings();
 
-        g5.addVertex(0);
-        g5.addVertex(1);
-        g5.addVertex(2);
-        g5.addVertex(3);
-        g5.addVertex(4);
-        g5.addVertex(5);
 
-        g5.addEdge(0, 1);
-        g5.addEdge(1, 2);
-        g5.addEdge(2, 3);
-        g5.addEdge(3, 4);
-        g5.addEdge(5, 2);
-        g5.addEdge(5, 3);
-        g5.addEdge(5, 4);
+        assertEquals("[0=1 1=2 2=0 3=3 4=4 5=~~]", iter.next().toString());
+        assertEquals("[0=2 1=1 2=3 3=0 4=4 5=~~]", iter.next().toString());
+        assertEquals(false, iter.hasNext());
 
-        ListenableUndirectedGraph<Integer, DefaultEdge> g6 =
-                new ListenableUndirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
+        /*** does not fail ***/
+        assertFalse(new VF2SubgraphIsomorphismInspector<Integer, DefaultEdge>(gem, gemUK1).isomorphismExists());
 
-        g6.addVertex(0);
-        g6.addVertex(1);
-        g6.addVertex(2);
-        g6.addVertex(3);
-        g6.addVertex(4);
-        g6.addVertex(5);
-
-        g6.addEdge(0, 1);
-//        g6.addEdge(1, 0);
-        g6.addEdge(1, 2);
-//        g6.addEdge(2, 1);
-        g6.addEdge(2, 3);
-//        g6.addEdge(3, 2);
-        g6.addEdge(4, 5);
-//        g6.addEdge(5, 4);
-        g6.addEdge(4, 2);
-//        g6.addEdge(2, 4);
-        g6.addEdge(5, 2);
-//        g6.addEdge(2, 5);
-        g6.addEdge(5, 3);
-//        g6.addEdge(3, 5);
-
-        VF2SubgraphIsomorphismInspector<Integer, DefaultEdge> vfs3 =
-                new VF2SubgraphIsomorphismInspector<Integer, DefaultEdge>
-                        (g5, g6);
-
-        assertEquals(false, vfs3.isomorphismExists());
-        }
+    }
     }
 
