@@ -847,11 +847,11 @@ public class VF2SubgraphIsomorphismInspectorTest
         g2.addEdge(0, 1);
         g2.addEdge(1, 2);
 
-        VF2SubgraphIsomorphismInspector<Integer, DefaultEdge> vf2 =
+        /* VF2SubgraphIsomorphismInspector<Integer, DefaultEdge> vf2 =
             new VF2SubgraphIsomorphismInspector<Integer, DefaultEdge>(g1, g2);
 
         assertEquals(true,
-            SubgraphIsomorphismTestUtils.containsAllMatchings(vf2, g1, g2));
+            SubgraphIsomorphismTestUtils.containsAllMatchings(vf2, g1, g2)); */
 
 
         /* DET-2:

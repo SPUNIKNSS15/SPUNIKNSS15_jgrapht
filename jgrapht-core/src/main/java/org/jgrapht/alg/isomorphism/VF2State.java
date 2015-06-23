@@ -38,6 +38,10 @@ package org.jgrapht.alg.isomorphism;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+
+enum Candidates {INPRED, OUTPRED, INSUCC, OUTSUCC, ALL};
 
 
 /**
@@ -62,6 +66,7 @@ public abstract class VF2State<V,E>
                     out1,
                     out2;
 
+
     protected int coreLen,
 
                   n1,
@@ -75,8 +80,17 @@ public abstract class VF2State<V,E>
                   t2OutLen,
 
                   addedVertex1,
+                  addedVertex2,
                   addVertex1,
-                  addVertex2;
+                  addVertex2,
+                  cand2,
+                  cand2Mem;
+
+    Candidates nextCandFrom,
+               nextCandMem;
+
+    List<Integer> cand1,
+                  cand1Mem;
 
     protected GraphOrdering<V,E> g1,
                                  g2;
@@ -110,13 +124,17 @@ public abstract class VF2State<V,E>
         core2 = new int[n2];
         in2   = new int[n2];
         out2  = new int[n2];
+        cand1 = new LinkedList<Integer>();
+        cand1Mem = new LinkedList<Integer>();
+
         Arrays.fill(core1, NULL_NODE);
         Arrays.fill(core2, NULL_NODE);
 
         coreLen = 0;
-        addedVertex1 = addVertex1 = addVertex2 = NULL_NODE;
+        addedVertex1 = addedVertex2 = addVertex1 = addVertex2 = cand2 = cand2Mem = NULL_NODE;
 
         t1BothLen = t2BothLen = t1InLen = t2InLen = t1OutLen = t2OutLen = 0;
+        nextCandFrom = nextCandMem = Candidates.ALL;
     }
 
     /**
@@ -147,12 +165,20 @@ public abstract class VF2State<V,E>
         t1OutLen  = s.t1OutLen;
         t2OutLen  = s.t2OutLen;
 
+        cand1     = s.cand1;
+        cand1Mem  = s.cand1Mem;
+        cand2     = s.cand2;
+        cand2Mem  = s.cand2Mem;
+
         vertexComparator = s.vertexComparator;
         edgeComparator   = s.edgeComparator;
 
         addVertex1   = s.addVertex1;
         addVertex2   = s.addVertex2;
         addedVertex1 = s.addedVertex1;
+        addedVertex2 = s.addedVertex2;
+        nextCandFrom = s.nextCandFrom;
+        nextCandMem  = s.nextCandMem;
     }
 
 
@@ -163,86 +189,105 @@ public abstract class VF2State<V,E>
      * @return false, if there are no more pairs left
      */
     public boolean nextPair() {
-        if (addVertex2 == NULL_NODE)
-            addVertex2 = 0;
+        if(nextCandMem!=Candidates.ALL) {
+            addVertex2 = cand2Mem;
 
-        if (addVertex1 == NULL_NODE)
-            addVertex1 = 0;
-        else
-            addVertex1++;
+            if (cand1Mem.size()>0) {
+                addVertex1 = cand1Mem.get(0);
+                cand1Mem.remove(0);
+                return true;
+            }
+            else {
 
-        // check incoming and outgoing edges
-        if (t1BothLen > coreLen && t2BothLen > coreLen) {
+                // there are no more pairs..
+                showLog("nextPair", "no more candidate pairs");
 
-            // find minimum for addVertex2 in core2 and t2in/t2out
-            while (addVertex2 < n2 &&
-                    (core2[addVertex2] != NULL_NODE ||
-                     out2[addVertex2] == 0 ||
-                     in2[addVertex2] == 0)) {
-                addVertex2++;
+                addVertex1 = addVertex2 = NULL_NODE;
+                return false;
+            }
+
+
+        } else {
+            if (addVertex2 == NULL_NODE)
+                addVertex2 = 0;
+
+            if (addVertex1 == NULL_NODE)
                 addVertex1 = 0;
-            }
-
-            // find first/next vertex for addVertex1 in core1 and t1in/t1out
-            while (addVertex1 < n1 &&
-                    (core1[addVertex1] != NULL_NODE ||
-                     out1[addVertex1] == 0 ||
-                     in1[addVertex1] == 0)) {
+            else
                 addVertex1++;
+
+            // check incoming and outgoing edges
+            if (t1BothLen > coreLen && t2BothLen > coreLen) {
+
+                // find minimum for addVertex2 in core2 and t2in/t2out
+                while (addVertex2 < n2 &&
+                        (core2[addVertex2] != NULL_NODE ||
+                                out2[addVertex2] == 0 ||
+                                in2[addVertex2] == 0)) {
+                    addVertex2++;
+                    addVertex1 = 0;
+                }
+
+                // find first/next vertex for addVertex1 in core1 and t1in/t1out
+                while (addVertex1 < n1 &&
+                        (core1[addVertex1] != NULL_NODE ||
+                                out1[addVertex1] == 0 ||
+                                in1[addVertex1] == 0)) {
+                    addVertex1++;
+                }
+            }
+
+            // check outgoing edges
+            else if (t1OutLen > coreLen && t2OutLen > coreLen) {
+                while (addVertex2 < n2 &&
+                        (core2[addVertex2] != NULL_NODE ||
+                                out2[addVertex2] == 0)) {
+                    addVertex2++;
+                    addVertex1 = 0;
+                }
+
+                while (addVertex1 < n1 &&
+                        (core1[addVertex1] != NULL_NODE ||
+                                out1[addVertex1] == 0)) {
+                    addVertex1++;
+                }
+            }
+
+            // check incoming edges
+            else if (t1InLen > coreLen && t2InLen > coreLen) {
+                while (addVertex2 < n2 &&
+                        (core2[addVertex2] != NULL_NODE ||
+                                in2[addVertex2] == 0)) {
+                    addVertex2++;
+                    addVertex1 = 0;
+                }
+
+                while (addVertex1 < n1 &&
+                        (core1[addVertex1] != NULL_NODE ||
+                                in1[addVertex1] == 0)) {
+                    addVertex1++;
+                }
+            }
+
+            // check new edges
+            else {
+                while (addVertex2 < n2 && core2[addVertex2] != NULL_NODE) {
+                    addVertex2++;
+                    addVertex1 = 0;
+                }
+
+                while (addVertex1 < n1 && core1[addVertex1] != NULL_NODE) {
+                    addVertex1++;
+                }
+            }
+
+            if (addVertex1 < n1 && addVertex2 < n2) {
+                showLog("nextPair", "next candidate pair: (" +
+                        g1.getVertex(addVertex1) + ", " +
+                        g2.getVertex(addVertex2) + ")");
+                return true;
             }
         }
-
-        // check outgoing edges
-        else if (t1OutLen > coreLen && t2OutLen > coreLen) {
-            while (addVertex2 < n2 &&
-                    (core2[addVertex2] != NULL_NODE ||
-                     out2[addVertex2] == 0)) {
-                addVertex2++;
-                addVertex1 = 0;
-            }
-
-            while (addVertex1 < n1 &&
-                    (core1[addVertex1] != NULL_NODE ||
-                     out1[addVertex1] == 0)) {
-                addVertex1++;
-            }
-        }
-
-        // check incoming edges
-        else if (t1InLen > coreLen && t2InLen > coreLen) {
-            while (addVertex2 < n2 &&
-                    (core2[addVertex2] != NULL_NODE ||
-                     in2[addVertex2] == 0)) {
-                addVertex2++;
-                addVertex1 = 0;
-            }
-
-            while (addVertex1 < n1 &&
-                    (core1[addVertex1] != NULL_NODE ||
-                     in1[addVertex1] == 0)) {
-                addVertex1++;
-            }
-        }
-
-        // check new edges
-        else {
-            while (addVertex2 < n2 && core2[addVertex2] != NULL_NODE) {
-                addVertex2++;
-                addVertex1 = 0;
-            }
-
-            while (addVertex1 < n1 && core1[addVertex1] != NULL_NODE) {
-                addVertex1++;
-            }
-        }
-
-        if (addVertex1 < n1 && addVertex2 < n2) {
-            showLog("nextPair", "next candidate pair: (" +
-                            g1.getVertex(addVertex1) + ", " +
-                            g2.getVertex(addVertex2) + ")");
-            return true;
-        }
-
         // there are no more pairs..
         showLog("nextPair", "no more candidate pairs");
 
@@ -259,6 +304,10 @@ public abstract class VF2State<V,E>
 
         coreLen++;
         addedVertex1 = addVertex1;
+        addedVertex2 = addVertex2;
+        nextCandMem  = nextCandFrom;
+        cand1Mem     = cand1;
+        cand2Mem     = cand2;
 
         if (in1[addVertex1] == 0) {
             in1[addVertex1] = coreLen;
