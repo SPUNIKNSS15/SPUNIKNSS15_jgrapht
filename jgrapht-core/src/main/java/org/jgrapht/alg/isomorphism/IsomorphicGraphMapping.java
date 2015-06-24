@@ -159,9 +159,6 @@ public class IsomorphicGraphMapping<V, E>
             str += (i++ == 0 ? "" : " ") + entry.getKey() + "=" +
                             (u == null ? "~~" : u);
         }
-
-        System.out.println(str);
-
         return str + "]";
     }
 
