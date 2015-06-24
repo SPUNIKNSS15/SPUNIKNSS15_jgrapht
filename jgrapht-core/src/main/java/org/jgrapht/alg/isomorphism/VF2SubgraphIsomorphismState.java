@@ -37,6 +37,7 @@
 package org.jgrapht.alg.isomorphism;
 
 import java.util.Comparator;
+import java.util.LinkedList;
 
 
 public class VF2SubgraphIsomorphismState<V,E>
@@ -85,7 +86,7 @@ public class VF2SubgraphIsomorphismState<V,E>
             newSucc2     = 0;
 
         nextCandFrom=Candidates.ALL;
-        cand1.clear();
+        cand1=new LinkedList<Integer>();
         cand2=NULL_NODE;
 
         // check outgoing edges of addVertex2
@@ -100,20 +101,10 @@ public class VF2SubgraphIsomorphismState<V,E>
                     return false;
                 }
             } else {
-                if (in2[other2] > 0) {
+                if (in2[other2] > 0)
                     termInSucc2++;
-                    if (nextCandFrom == Candidates.ALL) {
-                        nextCandFrom = Candidates.INSUCC;
-                        cand2 = other2;
-                    }
-                }
-                if (out2[other2] > 0) {
+                if (out2[other2] > 0)
                     termOutSucc2++;
-                    if (nextCandFrom == Candidates.ALL) {
-                        nextCandFrom = Candidates.OUTSUCC;
-                        cand2 = other2;
-                    }
-                }
                 if (in2[other2] == 0 && out2[other2] == 0)
                     newSucc2++;
             }
@@ -133,18 +124,10 @@ public class VF2SubgraphIsomorphismState<V,E>
                     return false;
                 }
             } else {
-                if (in1[other1] > 0) {
+                if (in1[other1] > 0)
                     termInSucc1++;
-                    if (nextCandFrom == Candidates.INSUCC) {
-                        cand1.add(other1);
-                    }
-                }
-                if (out1[other1] > 0) {
+                if (out1[other1] > 0)
                     termOutSucc1++;
-                    if (nextCandFrom == Candidates.OUTSUCC) {
-                        cand1.add(other1);
-                    }
-                }
                 if (in1[other1] == 0 && out1[other1] == 0)
                     newSucc1++;
             }
@@ -187,20 +170,10 @@ public class VF2SubgraphIsomorphismState<V,E>
                     return false;
                 }
             } else {
-                if (in2[other2] > 0) {
+                if (in2[other2] > 0)
                     termInPred2++;
-                    if (nextCandFrom == Candidates.ALL) {
-                        nextCandFrom = Candidates.INPRED;
-                        cand2 = other2;
-                    }
-                }
-                if (out2[other2] > 0) {
+                if (out2[other2] > 0)
                     termOutPred2++;
-                    if (nextCandFrom == Candidates.ALL) {
-                        nextCandFrom = Candidates.OUTPRED;
-                        cand2 = other2;
-                    }
-                }
                 if (in2[other2] == 0 && out2[other2] == 0)
                     newPred2++;
             }
@@ -220,16 +193,10 @@ public class VF2SubgraphIsomorphismState<V,E>
                     return false;
                 }
             } else {
-                if (in1[other1] > 0) {
+                if (in1[other1] > 0)
                     termInPred1++;
-                    if (nextCandFrom == Candidates.INPRED)
-                        cand1.add(other1);
-                }
-                if (out1[other1] > 0) {
+                if (out1[other1] > 0)
                     termOutPred1++;
-                    if (nextCandFrom == Candidates.OUTPRED)
-                        cand1.add(other1);
-                }
                 if (in1[other1] == 0 && out1[other1] == 0)
                     newPred1++;
             }
@@ -240,6 +207,94 @@ public class VF2SubgraphIsomorphismState<V,E>
                 termOutPred1 >= termOutPred2 &&
                 newPred1 >= newPred2)
         {
+            if (termInPred2>0) nextCandFrom=Candidates.INPRED;
+            if (termInSucc2>0 && termInSucc2 < termInPred2) nextCandFrom=Candidates.INSUCC;
+            if (termOutPred2>0 && termOutPred2 < termInPred2 && termOutPred2 < termInSucc2)
+                nextCandFrom=Candidates.OUTPRED;
+            if (termOutSucc2>0 && termOutSucc2 < termInPred2 && termOutSucc2 < termInSucc2 &&
+                    termOutSucc2 < termOutPred2) nextCandFrom=Candidates.OUTSUCC;
+
+            if (nextCandFrom==Candidates.INSUCC) {// check outgoing edges of addVertex2
+                for (int other2 : g2.getOutEdges(addVertex2)) {
+                    if (core2[other2] == NULL_NODE) {
+                        if (in2[other2] > 0) { //termInSucc2
+                            cand2 = other2;
+                            break;
+                        }
+                    }
+                }
+
+                // check outgoing edges of addVertex1
+                for (int other1 : g1.getOutEdges(addVertex1)) {
+                    if (core1[other1] == NULL_NODE) {
+                        if (in1[other1] > 0)
+                            cand1.add(other1);
+                    }
+                }
+            }
+
+            if (nextCandFrom == Candidates.OUTSUCC) {// check outgoing edges of addVertex2
+                for (int other2 : g2.getOutEdges(addVertex2)) {
+                    if (core2[other2] == NULL_NODE) {
+                        if (out2[other2] > 0) {//termOutSucc2
+                            cand2 = other2;
+                            break;
+                        }
+                    }
+                }
+
+                // check outgoing edges of addVertex1
+                for (int other1 : g1.getOutEdges(addVertex1)) {
+                    if (core1[other1] == NULL_NODE) {
+                        if (out1[other1] > 0)
+                            cand1.add(other1);
+                    }
+                }
+            }
+
+            if (nextCandFrom==Candidates.INPRED) {
+                // check incoming edges of addVertex2
+                for (int other2 : g2.getInEdges(addVertex2)) {
+                    if (core2[other2] == NULL_NODE) {
+                        if (in2[other2] > 0) {//termInPred2
+                            cand2 = other2;
+                            break;
+                        }
+                    }
+                }
+
+                // check incoming edges of addVertex1
+                for (int other1 : g1.getInEdges(addVertex1)) {
+                    if (core1[other1] == NULL_NODE) {
+                        if (in1[other1] > 0)
+                            cand1.add(other1);
+                    }
+                }
+            }
+
+
+            if (nextCandFrom == Candidates.OUTPRED) {
+                // check incoming edges of addVertex2
+                for (int other2 : g2.getInEdges(addVertex2)) {
+                    if (core2[other2] == NULL_NODE) {
+                        if (out2[other2] > 0) { //termOutPred2;
+                            cand2 = other2;
+                            break;
+                        }
+                    }
+                }
+
+                // check incoming edges of addVertex1
+                for (int other1 : g1.getInEdges(addVertex1)) {
+                    if (core1[other1] == NULL_NODE) {
+                        if (out1[other1] > 0)
+                            cand1.add(other1);
+                    }
+                }
+            }
+
+
+
             showLog("isFeasiblePair", pairstr + " fits");
             return true;
         }

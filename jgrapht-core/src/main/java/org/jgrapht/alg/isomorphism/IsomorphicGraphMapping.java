@@ -160,6 +160,8 @@ public class IsomorphicGraphMapping<V, E>
                             (u == null ? "~~" : u);
         }
 
+        System.out.println(str);
+
         return str + "]";
     }
 

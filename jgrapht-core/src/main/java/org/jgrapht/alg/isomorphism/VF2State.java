@@ -165,11 +165,6 @@ public abstract class VF2State<V,E>
         t1OutLen  = s.t1OutLen;
         t2OutLen  = s.t2OutLen;
 
-        cand1     = s.cand1;
-        cand1Mem  = s.cand1Mem;
-        cand2     = s.cand2;
-        cand2Mem  = s.cand2Mem;
-
         vertexComparator = s.vertexComparator;
         edgeComparator   = s.edgeComparator;
 
@@ -177,8 +172,64 @@ public abstract class VF2State<V,E>
         addVertex2   = s.addVertex2;
         addedVertex1 = s.addedVertex1;
         addedVertex2 = s.addedVertex2;
-        nextCandFrom = s.nextCandFrom;
-        nextCandMem  = s.nextCandMem;
+
+        //nextCandFrom = Candidates.ALL;
+//        nextCandFrom = s.nextCandFrom;
+        switch (s.nextCandMem) {
+            case ALL: {
+                nextCandMem  = Candidates.ALL;
+                break;
+            }
+            case INPRED: {
+                nextCandMem = Candidates.INPRED;
+                break;
+            }
+            case INSUCC: {
+                nextCandMem = Candidates.INSUCC;
+                break;
+            }
+            case OUTPRED: {
+                nextCandMem = Candidates.OUTPRED;
+                break;
+            }
+            case OUTSUCC: {
+                nextCandMem = Candidates.OUTSUCC;
+                break;
+            }
+        }
+        switch (s.nextCandFrom) {
+            case ALL: {
+                nextCandFrom  = Candidates.ALL;
+                break;
+            }
+            case INPRED: {
+                nextCandFrom = Candidates.INPRED;
+                break;
+            }
+            case INSUCC: {
+                nextCandFrom = Candidates.INSUCC;
+                break;
+            }
+            case OUTPRED: {
+                nextCandFrom = Candidates.OUTPRED;
+                break;
+            }
+            case OUTSUCC: {
+                nextCandFrom = Candidates.OUTSUCC;
+                break;
+            }
+        }
+        cand1  = new LinkedList<Integer>();
+        for (int a: s.cand1) {
+            cand1.add(a);
+        }
+//        cand1     = s.cand1;
+        cand1Mem  = new LinkedList<Integer>();
+        for (int a: s.cand1Mem) {
+            cand1Mem.add(a);
+        }
+        cand2     = s.cand2;
+        cand2Mem  = s.cand2Mem;
     }
 
 
@@ -292,6 +343,7 @@ public abstract class VF2State<V,E>
         showLog("nextPair", "no more candidate pairs");
 
         addVertex1 = addVertex2 = NULL_NODE;
+        //nextCandMem = Candidates.ALL;
         return false;
     }
 
