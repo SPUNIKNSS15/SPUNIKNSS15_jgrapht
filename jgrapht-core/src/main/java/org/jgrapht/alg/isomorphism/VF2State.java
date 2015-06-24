@@ -173,8 +173,6 @@ public abstract class VF2State<V,E>
         addedVertex1 = s.addedVertex1;
         addedVertex2 = s.addedVertex2;
 
-        //nextCandFrom = Candidates.ALL;
-//        nextCandFrom = s.nextCandFrom;
         switch (s.nextCandMem) {
             case ALL: {
                 nextCandMem  = Candidates.ALL;
@@ -223,7 +221,6 @@ public abstract class VF2State<V,E>
         for (int a: s.cand1) {
             cand1.add(a);
         }
-//        cand1     = s.cand1;
         cand1Mem  = new LinkedList<Integer>();
         for (int a: s.cand1Mem) {
             cand1Mem.add(a);
@@ -343,7 +340,6 @@ public abstract class VF2State<V,E>
         showLog("nextPair", "no more candidate pairs");
 
         addVertex1 = addVertex2 = NULL_NODE;
-        //nextCandMem = Candidates.ALL;
         return false;
     }
 
