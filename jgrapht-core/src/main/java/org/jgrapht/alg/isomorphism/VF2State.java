@@ -41,8 +41,6 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-enum Candidates {INPRED, OUTPRED, INSUCC, OUTSUCC, ALL};
-
 
 /**
  * controls the matching between two graphs according to the VF2 algorithm.
@@ -58,6 +56,8 @@ public abstract class VF2State<V,E>
     public static final int NULL_NODE = -1;
 
     protected static final boolean DEBUG = false;
+
+    enum Candidates {INPRED, OUTPRED, INSUCC, OUTSUCC, ALL};
 
     protected int[] core1,
                     core2,

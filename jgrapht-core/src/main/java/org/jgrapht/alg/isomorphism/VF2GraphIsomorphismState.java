@@ -37,6 +37,7 @@
 package org.jgrapht.alg.isomorphism;
 
 import java.util.Comparator;
+import java.util.LinkedList;
 
 
 public class VF2GraphIsomorphismState<V,E>
@@ -82,6 +83,10 @@ public class VF2GraphIsomorphismState<V,E>
             termInSucc2  = 0,
             newSucc1     = 0,
             newSucc2     = 0;
+
+        nextCandFrom=Candidates.ALL;
+        cand1=new LinkedList<Integer>();
+        cand2=NULL_NODE;
 
         // check outgoing edges of addVertex1
         for (int other1 : g1.getOutEdges(addVertex1)) {
@@ -200,6 +205,93 @@ public class VF2GraphIsomorphismState<V,E>
             termOutPred1 == termOutPred2 &&
             newPred1 == newPred2)
         {
+            if (termInPred2>0) nextCandFrom=Candidates.INPRED;
+            if (termInSucc2>0 && termInSucc2 < termInPred2) nextCandFrom=Candidates.INSUCC;
+            if (termOutPred2>0 && termOutPred2 < termInPred2 && termOutPred2 < termInSucc2)
+                nextCandFrom=Candidates.OUTPRED;
+            if (termOutSucc2>0 && termOutSucc2 < termInPred2 && termOutSucc2 < termInSucc2 &&
+                    termOutSucc2 < termOutPred2) nextCandFrom=Candidates.OUTSUCC;
+
+            if (nextCandFrom==Candidates.INSUCC) {// check outgoing edges of addVertex2
+                for (int other2 : g2.getOutEdges(addVertex2)) {
+                    if (core2[other2] == NULL_NODE) {
+                        if (in2[other2] > 0) { //termInSucc2
+                            cand2 = other2;
+                            break;
+                        }
+                    }
+                }
+
+                // check outgoing edges of addVertex1
+                for (int other1 : g1.getOutEdges(addVertex1)) {
+                    if (core1[other1] == NULL_NODE) {
+                        if (in1[other1] > 0)
+                            cand1.add(other1);
+                    }
+                }
+            }
+
+            if (nextCandFrom == Candidates.OUTSUCC) {// check outgoing edges of addVertex2
+                for (int other2 : g2.getOutEdges(addVertex2)) {
+                    if (core2[other2] == NULL_NODE) {
+                        if (out2[other2] > 0) {//termOutSucc2
+                            cand2 = other2;
+                            break;
+                        }
+                    }
+                }
+
+                // check outgoing edges of addVertex1
+                for (int other1 : g1.getOutEdges(addVertex1)) {
+                    if (core1[other1] == NULL_NODE) {
+                        if (out1[other1] > 0)
+                            cand1.add(other1);
+                    }
+                }
+            }
+
+            if (nextCandFrom==Candidates.INPRED) {
+                // check incoming edges of addVertex2
+                for (int other2 : g2.getInEdges(addVertex2)) {
+                    if (core2[other2] == NULL_NODE) {
+                        if (in2[other2] > 0) {//termInPred2
+                            cand2 = other2;
+                            break;
+                        }
+                    }
+                }
+
+                // check incoming edges of addVertex1
+                for (int other1 : g1.getInEdges(addVertex1)) {
+                    if (core1[other1] == NULL_NODE) {
+                        if (in1[other1] > 0)
+                            cand1.add(other1);
+                    }
+                }
+            }
+
+
+            if (nextCandFrom == Candidates.OUTPRED) {
+                // check incoming edges of addVertex2
+                for (int other2 : g2.getInEdges(addVertex2)) {
+                    if (core2[other2] == NULL_NODE) {
+                        if (out2[other2] > 0) { //termOutPred2;
+                            cand2 = other2;
+                            break;
+                        }
+                    }
+                }
+
+                // check incoming edges of addVertex1
+                for (int other1 : g1.getInEdges(addVertex1)) {
+                    if (core1[other1] == NULL_NODE) {
+                        if (out1[other1] > 0)
+                            cand1.add(other1);
+                    }
+                }
+            }
+
+
             showLog("isFeasiblePair", pairstr + " fits");
             return true;
         }
