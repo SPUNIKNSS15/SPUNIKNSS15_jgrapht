@@ -1134,7 +1134,7 @@ public class VF2SubgraphIsomorphismInspectorTest
      */
     @Test
     public void testHugeGraph() {
-        int n = 900;
+        int n = 950;
         long time = System.currentTimeMillis();
 
         DirectedGraph<Integer, DefaultEdge> g1 =

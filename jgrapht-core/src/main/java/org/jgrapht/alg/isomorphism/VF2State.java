@@ -57,7 +57,7 @@ public abstract class VF2State<V,E>
 
     protected static final boolean DEBUG = false;
 
-    enum Candidates {INPRED, OUTPRED, INSUCC, OUTSUCC, ALL};
+    enum Candidates {INPRED, OUTPRED, INSUCC, OUTSUCC, NEWPRED, NEWSUCC, ALL};
 
     protected int[] core1,
                     core2,
@@ -173,6 +173,7 @@ public abstract class VF2State<V,E>
         addedVertex1 = s.addedVertex1;
         addedVertex2 = s.addedVertex2;
 
+        /* copy value, not reference */
         switch (s.nextCandMem) {
             case ALL: {
                 nextCandMem  = Candidates.ALL;
@@ -192,6 +193,14 @@ public abstract class VF2State<V,E>
             }
             case OUTSUCC: {
                 nextCandMem = Candidates.OUTSUCC;
+                break;
+            }
+            case NEWPRED: {
+                nextCandMem = Candidates.NEWPRED;
+                break;
+            }
+            case NEWSUCC: {
+                nextCandMem = Candidates.NEWSUCC;
                 break;
             }
         }
@@ -216,7 +225,16 @@ public abstract class VF2State<V,E>
                 nextCandFrom = Candidates.OUTSUCC;
                 break;
             }
+            case NEWPRED: {
+                nextCandFrom = Candidates.NEWPRED;
+                break;
+            }
+            case NEWSUCC: {
+                nextCandFrom = Candidates.NEWSUCC;
+                break;
+            }
         }
+        /* copy values, not reference */
         cand1  = new LinkedList<Integer>();
         for (int a: s.cand1) {
             cand1.add(a);
@@ -237,12 +255,11 @@ public abstract class VF2State<V,E>
      * @return false, if there are no more pairs left
      */
     public boolean nextPair() {
-        if(nextCandMem!=Candidates.ALL) {
+        if (nextCandMem != Candidates.ALL) { //check if candidate set is already predefined
             addVertex2 = cand2Mem;
 
             if (cand1Mem.size()>0) {
-                addVertex1 = cand1Mem.get(0);
-                cand1Mem.remove(0);
+                addVertex1 = cand1Mem.remove(0); //get first candidate and remove it from list
                 return true;
             }
             else {

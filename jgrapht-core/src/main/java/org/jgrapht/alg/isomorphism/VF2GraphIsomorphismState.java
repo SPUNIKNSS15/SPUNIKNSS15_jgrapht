@@ -64,9 +64,11 @@ public class VF2GraphIsomorphismState<V,E>
      */
     @Override
     public boolean isFeasiblePair() {
+
         String pairstr  = "(" + g1.getVertex(addVertex1) + ", " +
                         g2.getVertex(addVertex2) + ")",
                abortmsg = pairstr + " does not fit in the current matching";
+
         // check for semantic equality of both vertexes
         if (!areCompatibleVertexes(addVertex1, addVertex2))
             return false;
@@ -205,92 +207,133 @@ public class VF2GraphIsomorphismState<V,E>
             termOutPred1 == termOutPred2 &&
             newPred1 == newPred2)
         {
+            /* search smallest possible candidate set for next iteration */
             if (termInPred2>0) nextCandFrom=Candidates.INPRED;
-            if (termInSucc2>0 && termInSucc2 < termInPred2) nextCandFrom=Candidates.INSUCC;
-            if (termOutPred2>0 && termOutPred2 < termInPred2 && termOutPred2 < termInSucc2)
+            if (termInSucc2>0 && termInSucc1 < termInPred1) nextCandFrom=Candidates.INSUCC;
+            if (termOutPred2>0 && termOutPred1 < termInPred1 && termOutPred1 < termInSucc1)
                 nextCandFrom=Candidates.OUTPRED;
-            if (termOutSucc2>0 && termOutSucc2 < termInPred2 && termOutSucc2 < termInSucc2 &&
-                    termOutSucc2 < termOutPred2) nextCandFrom=Candidates.OUTSUCC;
+            if (termOutSucc2>0 && termOutSucc1 < termInPred1 && termOutSucc1 < termInSucc1 &&
+                    termOutSucc1 < termOutPred1) nextCandFrom=Candidates.OUTSUCC;
+            if (newSucc2>0 && newSucc1 < termInPred1 && newSucc1 < termInSucc1 &&
+                    newSucc1 < termOutPred1 && newSucc1 < termOutSucc1) nextCandFrom=Candidates.NEWSUCC;
+            if (newPred2>0 && newPred1 < termInPred1 && newPred1 < termInSucc1 &&
+                    newPred1 < termOutPred1 && newPred1 < termOutSucc1 &&
+                    newPred1 < newSucc1) nextCandFrom=Candidates.NEWPRED;
 
-            if (nextCandFrom==Candidates.INSUCC) {// check outgoing edges of addVertex2
-                for (int other2 : g2.getOutEdges(addVertex2)) {
+            /* get candidates for next step if optimal candidate set relies to insucc */
+            if (nextCandFrom==Candidates.INSUCC) {
+                for (int other2 : g2.getOutEdges(addVertex2)) {// check outgoing edges of addVertex2
                     if (core2[other2] == NULL_NODE) {
-                        if (in2[other2] > 0) { //termInSucc2
+                        if (in2[other2] > 0) {// get first possible vertex counting for termInSucc2 as G2 candidate
                             cand2 = other2;
                             break;
                         }
                     }
                 }
 
-                // check outgoing edges of addVertex1
-                for (int other1 : g1.getOutEdges(addVertex1)) {
+                for (int other1 : g1.getOutEdges(addVertex1)) {// check outgoing edges of addVertex1
                     if (core1[other1] == NULL_NODE) {
                         if (in1[other1] > 0)
-                            cand1.add(other1);
+                            cand1.add(other1);// get all possible vertices counting for termInSucc1 as G1 candidates
                     }
                 }
             }
 
-            if (nextCandFrom == Candidates.OUTSUCC) {// check outgoing edges of addVertex2
-                for (int other2 : g2.getOutEdges(addVertex2)) {
+            /* get candidates for next step if optimal candidate set relies to outsucc */
+            if (nextCandFrom == Candidates.OUTSUCC) {
+                for (int other2 : g2.getOutEdges(addVertex2)) {// check outgoing edges of addVertex2
                     if (core2[other2] == NULL_NODE) {
-                        if (out2[other2] > 0) {//termOutSucc2
+                        if (out2[other2] > 0) {// get first possible vertex counting for termOutSucc2 as G2 candidate
                             cand2 = other2;
                             break;
                         }
                     }
                 }
 
-                // check outgoing edges of addVertex1
-                for (int other1 : g1.getOutEdges(addVertex1)) {
+                for (int other1 : g1.getOutEdges(addVertex1)) {// check outgoing edges of addVertex1
                     if (core1[other1] == NULL_NODE) {
                         if (out1[other1] > 0)
-                            cand1.add(other1);
+                            cand1.add(other1);// get all possible vertices counting for termOutSucc1 as G1 candidates
                     }
                 }
             }
 
+            /* get candidates for next step if optimal candidate set relies to inpred */
             if (nextCandFrom==Candidates.INPRED) {
-                // check incoming edges of addVertex2
-                for (int other2 : g2.getInEdges(addVertex2)) {
+                for (int other2 : g2.getInEdges(addVertex2)) {// check incoming edges of addVertex2
                     if (core2[other2] == NULL_NODE) {
-                        if (in2[other2] > 0) {//termInPred2
+                        if (in2[other2] > 0) {// get first possible vertex counting for termInPred2 as G2 candidate
                             cand2 = other2;
                             break;
                         }
                     }
                 }
 
-                // check incoming edges of addVertex1
-                for (int other1 : g1.getInEdges(addVertex1)) {
+                for (int other1 : g1.getInEdges(addVertex1)) {// check incoming edges of addVertex1
                     if (core1[other1] == NULL_NODE) {
                         if (in1[other1] > 0)
-                            cand1.add(other1);
+                            cand1.add(other1);// get all possible vertices counting for termInPred1 as G1 candidates
                     }
                 }
             }
 
 
+            /* get candidates for next step if optimal candidate set relies to outpred */
             if (nextCandFrom == Candidates.OUTPRED) {
-                // check incoming edges of addVertex2
-                for (int other2 : g2.getInEdges(addVertex2)) {
+                for (int other2 : g2.getInEdges(addVertex2)) {// check incoming edges of addVertex2
                     if (core2[other2] == NULL_NODE) {
-                        if (out2[other2] > 0) { //termOutPred2;
+                        if (out2[other2] > 0) {// get first possible vertex counting for termOutPred2 as G2 candidate
                             cand2 = other2;
                             break;
                         }
                     }
                 }
 
-                // check incoming edges of addVertex1
-                for (int other1 : g1.getInEdges(addVertex1)) {
+                for (int other1 : g1.getInEdges(addVertex1)) {// check incoming edges of addVertex1
                     if (core1[other1] == NULL_NODE) {
                         if (out1[other1] > 0)
-                            cand1.add(other1);
+                            cand1.add(other1);// get all possible vertices counting for termOutPred1 as G1 candidates
                     }
                 }
             }
 
+            /* get candidates for next step if optimal candidate set relies to newsucc */
+            if (nextCandFrom==Candidates.NEWSUCC) {
+                for (int other2 : g2.getOutEdges(addVertex2)) {// check outgoing edges of addVertex2
+                    if (core2[other2] == NULL_NODE) {
+                        if (in2[other2] == 0 && out2[other2]== 0) {
+                            cand2 = other2;// get first possible vertex counting for newSucc2 as G2 candidate
+                            break;
+                        }
+                    }
+                }
+
+                for (int other1 : g1.getOutEdges(addVertex1)) {// check outgoing edges of addVertex1
+                    if (core1[other1] == NULL_NODE) {
+                        if (in1[other1] == 0 && out1[other1]== 0)
+                            cand1.add(other1);// get all possible vertices counting for newSucc1 as G1 candidates
+                    }
+                }
+            }
+
+            /* get candidates for next step if optimal candidate set relies to newpred */
+            if (nextCandFrom==Candidates.NEWPRED) {
+                for (int other2 : g2.getOutEdges(addVertex2)) {// check outgoing edges of addVertex2
+                    if (core2[other2] == NULL_NODE) {
+                        if (in2[other2] == 0 && out2[other2]== 0) {
+                            cand2 = other2;// get first possible vertex counting for newPred2 as G2 candidate
+                            break;
+                        }
+                    }
+                }
+
+                for (int other1 : g1.getOutEdges(addVertex1)) {// check outgoing edges of addVertex1
+                    if (core1[other1] == NULL_NODE) {
+                        if (in1[other1] == 0 && out1[other1]== 0)
+                            cand1.add(other1);// get all possible vertices counting for newPred1 as G1 candidates
+                    }
+                }
+            }
 
             showLog("isFeasiblePair", pairstr + " fits");
             return true;
