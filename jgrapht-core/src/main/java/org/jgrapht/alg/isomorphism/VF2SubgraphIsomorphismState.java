@@ -38,6 +38,7 @@ package org.jgrapht.alg.isomorphism;
 
 import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.List;
 
 
 public class VF2SubgraphIsomorphismState<V,E>
@@ -207,17 +208,31 @@ public class VF2SubgraphIsomorphismState<V,E>
                 newPred1 >= newPred2)
         {
             /* search smallest possible candidate set for next iteration */
-            if (termInPred2>0) nextCandFrom=Candidates.INPRED;
-            if (termInSucc2>0 && termInSucc1 < termInPred1) nextCandFrom=Candidates.INSUCC;
-            if (termOutPred2>0 && termOutPred1 < termInPred1 && termOutPred1 < termInSucc1)
-                nextCandFrom=Candidates.OUTPRED;
-            if (termOutSucc2>0 && termOutSucc1 < termInPred1 && termOutSucc1 < termInSucc1 &&
-                    termOutSucc1 < termOutPred1) nextCandFrom=Candidates.OUTSUCC;
-            if (newSucc2>0 && newSucc1 < termInPred1 && newSucc1 < termInSucc1 &&
-                    newSucc1 < termOutPred1 && newSucc1 < termOutSucc1) nextCandFrom=Candidates.NEWSUCC;
-            if (newPred2>0 && newPred1 < termInPred1 && newPred1 < termInSucc1 &&
-                    newPred1 < termOutPred1 && newPred1 < termOutSucc1 &&
-                    newPred1 < newSucc1) nextCandFrom=Candidates.NEWPRED;
+            Integer minimalNumber = 0;
+            if (termInPred2 > 0) {
+                nextCandFrom  = Candidates.INPRED;
+                minimalNumber = termInPred1;
+            }
+            if (termInSucc2 > 0 && (minimalNumber == 0 || termInSucc1 < minimalNumber)) {
+                nextCandFrom  = Candidates.INSUCC;
+                minimalNumber = termInSucc1;
+            }
+            if (termOutPred2 > 0 && (minimalNumber == 0 || termOutPred1 < minimalNumber)) {
+                nextCandFrom  = Candidates.OUTPRED;
+                minimalNumber = termOutPred1;
+            }
+            if (termOutSucc2 > 0 && (minimalNumber == 0 || termOutSucc1 < minimalNumber)) {
+                nextCandFrom  = Candidates.OUTSUCC;
+                minimalNumber = termOutSucc1;
+            }
+            if (newSucc2 > 0 && (minimalNumber == 0 || newSucc1 < minimalNumber)) {
+                nextCandFrom  = Candidates.NEWSUCC;
+                minimalNumber = newSucc1;
+            }
+            if (newPred2 > 0 && (minimalNumber == 0 || newPred1 < minimalNumber)) {
+                nextCandFrom  = Candidates.NEWPRED;
+                minimalNumber = newPred1;
+            }
 
             /* get candidates for next step if optimal candidate set relies to insucc */
             if (nextCandFrom==Candidates.INSUCC) {
