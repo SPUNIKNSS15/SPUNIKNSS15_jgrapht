@@ -22,10 +22,9 @@
 /* -------------------------
  * VF2SubgraphIsomorphismState.java
  * -------------------------
- * (C) Copyright 2015, by Fabian Späh and Contributors.
+ * (C) Copyright 2015, by Fabian Späh and Rita Dobler.
  *
- * Original Author:  Fabian Späh
- * Contributor(s):   Rita Dobler
+ * Author:  Fabian Späh, Rita Dobler
  *
  * $Id$
  *
@@ -134,6 +133,7 @@ public class VF2SubgraphIsomorphismState<V,E>
             }
         }
 
+        /* negated feasibility condition */
         if (termInSucc1 < termInSucc2 ||
             termOutSucc1 < termOutSucc2 ||
             newSucc1 < newSucc2)
@@ -203,6 +203,7 @@ public class VF2SubgraphIsomorphismState<V,E>
             }
         }
 
+        /* feasibility condition */
         if (termInPred1 >= termInPred2 &&
                 termOutPred1 >= termOutPred2 &&
                 newPred1 >= newPred2)
@@ -244,7 +245,6 @@ public class VF2SubgraphIsomorphismState<V,E>
                         }
                     }
                 }
-
                 for (int other1 : g1.getOutEdges(addVertex1)) {// check outgoing edges of addVertex1
                     if (core1[other1] == NULL_NODE) {
                         if (in1[other1] > 0)
@@ -263,7 +263,6 @@ public class VF2SubgraphIsomorphismState<V,E>
                         }
                     }
                 }
-
                 for (int other1 : g1.getOutEdges(addVertex1)) {// check outgoing edges of addVertex1
                     if (core1[other1] == NULL_NODE) {
                         if (out1[other1] > 0)
@@ -282,7 +281,6 @@ public class VF2SubgraphIsomorphismState<V,E>
                         }
                     }
                 }
-
                 for (int other1 : g1.getInEdges(addVertex1)) {// check incoming edges of addVertex1
                     if (core1[other1] == NULL_NODE) {
                         if (in1[other1] > 0)
@@ -301,7 +299,6 @@ public class VF2SubgraphIsomorphismState<V,E>
                         }
                     }
                 }
-
                 for (int other1 : g1.getInEdges(addVertex1)) {// check incoming edges of addVertex1
                     if (core1[other1] == NULL_NODE) {
                         if (out1[other1] > 0)
@@ -320,7 +317,6 @@ public class VF2SubgraphIsomorphismState<V,E>
                         }
                     }
                 }
-
                 for (int other1 : g1.getOutEdges(addVertex1)) {// check outgoing edges of addVertex1
                     if (core1[other1] == NULL_NODE) {
                         if (in1[other1] == 0 && out1[other1]== 0)
@@ -339,7 +335,6 @@ public class VF2SubgraphIsomorphismState<V,E>
                         }
                     }
                 }
-
                 for (int other1 : g1.getInEdges(addVertex1)) {// check ingoing edges of addVertex1
                     if (core1[other1] == NULL_NODE) {
                         if (in1[other1] == 0 && out1[other1]== 0)

@@ -45,7 +45,7 @@ import java.util.List;
 /**
  * controls the matching between two graphs according to the VF2 algorithm.
  * 
- * @author Fabian Späh
+ * @author Fabian Späh, Rita Dobler
  *
  * @param <V> the type of the vertices
  * @param <E> the type of the edges
@@ -86,11 +86,10 @@ public abstract class VF2State<V,E>
                   cand2,
                   cand2Mem;
 
-    Candidates nextCandFrom,
-               nextCandMem;
-
     List<Integer> cand1,
                   cand1Mem;
+
+    Candidates nextCandFrom;
 
     protected GraphOrdering<V,E> g1,
                                  g2;
@@ -124,17 +123,18 @@ public abstract class VF2State<V,E>
         core2 = new int[n2];
         in2   = new int[n2];
         out2  = new int[n2];
-        cand1 = new LinkedList<Integer>();
-        cand1Mem = new LinkedList<Integer>();
 
         Arrays.fill(core1, NULL_NODE);
         Arrays.fill(core2, NULL_NODE);
 
         coreLen = 0;
-        addedVertex1 = addedVertex2 = addVertex1 = addVertex2 = cand2 = cand2Mem = NULL_NODE;
-
+        addedVertex1 = addedVertex2 = addVertex1 = addVertex2 = NULL_NODE;
         t1BothLen = t2BothLen = t1InLen = t2InLen = t1OutLen = t2OutLen = 0;
-        nextCandFrom = nextCandMem = Candidates.ALL;
+
+        cand1        = new LinkedList<Integer>();
+        cand1Mem     = new LinkedList<Integer>();
+        cand2        = cand2Mem = NULL_NODE;
+        nextCandFrom = Candidates.ALL;
     }
 
     /**
@@ -173,67 +173,6 @@ public abstract class VF2State<V,E>
         addedVertex1 = s.addedVertex1;
         addedVertex2 = s.addedVertex2;
 
-        /* copy value, not reference */
-        switch (s.nextCandMem) {
-            case ALL: {
-                nextCandMem  = Candidates.ALL;
-                break;
-            }
-            case INPRED: {
-                nextCandMem = Candidates.INPRED;
-                break;
-            }
-            case INSUCC: {
-                nextCandMem = Candidates.INSUCC;
-                break;
-            }
-            case OUTPRED: {
-                nextCandMem = Candidates.OUTPRED;
-                break;
-            }
-            case OUTSUCC: {
-                nextCandMem = Candidates.OUTSUCC;
-                break;
-            }
-            case NEWPRED: {
-                nextCandMem = Candidates.NEWPRED;
-                break;
-            }
-            case NEWSUCC: {
-                nextCandMem = Candidates.NEWSUCC;
-                break;
-            }
-        }
-        switch (s.nextCandFrom) {
-            case ALL: {
-                nextCandFrom  = Candidates.ALL;
-                break;
-            }
-            case INPRED: {
-                nextCandFrom = Candidates.INPRED;
-                break;
-            }
-            case INSUCC: {
-                nextCandFrom = Candidates.INSUCC;
-                break;
-            }
-            case OUTPRED: {
-                nextCandFrom = Candidates.OUTPRED;
-                break;
-            }
-            case OUTSUCC: {
-                nextCandFrom = Candidates.OUTSUCC;
-                break;
-            }
-            case NEWPRED: {
-                nextCandFrom = Candidates.NEWPRED;
-                break;
-            }
-            case NEWSUCC: {
-                nextCandFrom = Candidates.NEWSUCC;
-                break;
-            }
-        }
         /* copy values, not reference */
         cand1  = new LinkedList<Integer>();
         for (int a: s.cand1) {
@@ -255,7 +194,7 @@ public abstract class VF2State<V,E>
      * @return false, if there are no more pairs left
      */
     public boolean nextPair() {
-        if (nextCandMem != Candidates.ALL) { //check if candidate set is already predefined
+        if (cand2Mem != NULL_NODE) { //check if candidate set is already predefined
             addVertex2 = cand2Mem;
 
             if (cand1Mem.size()>0) {
@@ -370,7 +309,6 @@ public abstract class VF2State<V,E>
         coreLen++;
         addedVertex1 = addVertex1;
         addedVertex2 = addVertex2;
-        nextCandMem  = nextCandFrom;
         cand1Mem     = cand1;
         cand2Mem     = cand2;
 
