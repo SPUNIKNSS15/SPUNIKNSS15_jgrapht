@@ -51,23 +51,22 @@ import java.util.Set;
  * This class represents the order on the graph vertices. There are also some
  * helper-functions for receiving outgoing/incoming edges, etc.
  * 
- * @author Fabian Späh
- * 
  * @param <V> the type of the vertices
  * @param <E> the type of the edges
  */
 
-public class GraphOrdering<V, E>
+class GraphOrdering<V, E>
 {
 
     private Graph<V, E>     graph;
 
     private Map<V, Integer> mapVertexToOrder;
-    private Object[]        mapOrderToVertex;
+    private ArrayList<V>    mapOrderToVertex;
     private int             vertexCount;
 
     private int[][]         outgoingEdges;
     private int[][]         incomingEdges;
+    private Boolean[][]     adjMatrix;
 
     private boolean         cacheEdges;
 
@@ -76,6 +75,8 @@ public class GraphOrdering<V, E>
      * @param graph the graph to be ordered
      * @param orderByDegree should the vertices be ordered by their degree. This
      *        speeds up the VF2 algorithm.
+     * @param cacheEdges if true, the class creates a adjacency matrix and two
+     *        arrays for incoming and outgoing edges for fast access.
      */
     public GraphOrdering(Graph<V, E> graph,
                          boolean orderByDegree,
@@ -90,18 +91,18 @@ public class GraphOrdering<V, E>
 
         vertexCount      = vertexSet.size();
         mapVertexToOrder = new HashMap<V, Integer>();
-        mapOrderToVertex = new Object[vertexCount];
+        mapOrderToVertex = new ArrayList<V>(vertexCount);
 
-        outgoingEdges    = new int[vertexCount][];
-        incomingEdges    = new int[vertexCount][];
+        if (cacheEdges) {
+            outgoingEdges = new int[vertexCount][];
+            incomingEdges = new int[vertexCount][];
+            adjMatrix = new Boolean[vertexCount][vertexCount];
+        }
 
         Integer i = 0;
         for (V vertex : vertexSet) {
-            mapVertexToOrder.put(vertex, i);
-            mapOrderToVertex[i] = vertex;
-
-            outgoingEdges[i]   = null;
-            incomingEdges[i++] = null;
+            mapVertexToOrder.put(vertex, i++);
+            mapOrderToVertex.add(vertex);
         }
     }
 
@@ -148,7 +149,10 @@ public class GraphOrdering<V, E>
                 mapVertexToOrder.get(source.equals(v) ? target : source);
         }
 
-        return outgoingEdges[vertexNumber] = vertexArray;
+        if (cacheEdges)
+            outgoingEdges[vertexNumber] = vertexArray;
+
+        return vertexArray;
     }
 
     /**
@@ -179,7 +183,10 @@ public class GraphOrdering<V, E>
                 mapVertexToOrder.get(source.equals(v) ? target : source);
         }
 
-        return incomingEdges[vertexNumber] = vertexArray;
+        if (cacheEdges)
+            incomingEdges[vertexNumber] = vertexArray;
+
+        return vertexArray;
     }
 
     /**
@@ -188,21 +195,32 @@ public class GraphOrdering<V, E>
      * @return exists the edge from v1 to v2
      */
     public boolean hasEdge(int v1Number, int v2Number) {
-        V v1 = getVertex(v1Number),
-          v2 = getVertex(v2Number);
+        V v1, v2;
+        Boolean containsEdge = null;
 
-        return graph.containsEdge(v1, v2);
+        if (cacheEdges)
+            containsEdge = adjMatrix[v1Number][v2Number];
+
+        if (!cacheEdges || containsEdge == null) {
+            v1 = getVertex(v1Number);
+            v2 = getVertex(v2Number);
+            containsEdge = graph.containsEdge(v1, v2);
+        }
+        
+        if (cacheEdges && adjMatrix[v1Number][v2Number] == null)
+            adjMatrix[v1Number][v2Number] = containsEdge;
+
+        return containsEdge;
     }
 
     /**
-     * be careful: there's no check for a invalid vertexNumber
+     * be careful: there's no check against an invalid vertexNumber
      * 
      * @param vertexNumber the number identifying the vertex v
      * @return v
      */
-    @SuppressWarnings("unchecked")
     public V getVertex(int vertexNumber) {
-        return (V)mapOrderToVertex[vertexNumber];
+        return mapOrderToVertex.get(vertexNumber);
     }
 
     /**

@@ -27,6 +27,7 @@ build
 .buildpath
 .svn
 .idea/*
+*.iml
 out/*
 **/.idea/*
 **/out/*

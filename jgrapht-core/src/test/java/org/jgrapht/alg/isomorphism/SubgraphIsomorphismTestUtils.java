@@ -46,6 +46,7 @@ import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
+import org.jgrapht.GraphMapping;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
@@ -62,7 +63,7 @@ public class SubgraphIsomorphismTestUtils
         showLog(">> ");
         boolean isCorrect = true;
 
-        for (Iterator<IsomorphicGraphMapping<Integer, DefaultEdge>> mappings =
+        for (Iterator<GraphMapping<Integer, DefaultEdge>> mappings =
                         vf2.getMappings(); mappings.hasNext();)
         {
             isCorrect = isCorrect &&
@@ -76,7 +77,7 @@ public class SubgraphIsomorphismTestUtils
 
 
     public static boolean isCorrectMatching(
-                    IsomorphicGraphMapping<Integer, DefaultEdge> rel,
+                    GraphMapping<Integer, DefaultEdge> rel,
                     DirectedGraph<Integer, DefaultEdge> g1,
                     DirectedGraph<Integer, DefaultEdge> g2)
     {
@@ -200,16 +201,17 @@ public class SubgraphIsomorphismTestUtils
         ArrayList<IsomorphicGraphMapping<Integer, DefaultEdge>> matchings =
                         getMatchings(g1, g2);
 
-        loop:for(Iterator<IsomorphicGraphMapping<Integer, DefaultEdge>>
+        loop:for(Iterator<GraphMapping<Integer, DefaultEdge>>
                      mappings = vf2.getMappings(); mappings.hasNext();) {
-            IsomorphicGraphMapping<Integer, DefaultEdge> rel1 = mappings.next();
+            IsomorphicGraphMapping<Integer, DefaultEdge> rel1 =
+                (IsomorphicGraphMapping<Integer, DefaultEdge>) mappings.next();
 
             showLog("> " + rel1 + " ..");
 
             for (IsomorphicGraphMapping<Integer, DefaultEdge>
                         rel2 : matchings)
             {
-                if (rel1.equals(rel2))  {
+                if (rel1.isEqualMapping(rel2))  {
                     matchings.remove(rel2);
                     showLog("exists\n");
                     continue loop;

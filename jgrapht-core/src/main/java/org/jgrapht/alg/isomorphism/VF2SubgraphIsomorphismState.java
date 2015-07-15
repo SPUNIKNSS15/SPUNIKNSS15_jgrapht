@@ -40,7 +40,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-public class VF2SubgraphIsomorphismState<V,E>
+class VF2SubgraphIsomorphismState<V,E>
     extends VF2State<V,E>
 {
 

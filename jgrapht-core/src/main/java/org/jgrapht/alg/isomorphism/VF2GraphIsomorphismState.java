@@ -39,7 +39,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 
 
-public class VF2GraphIsomorphismState<V,E>
+class VF2GraphIsomorphismState<V,E>
     extends VF2State<V,E>
 {
 

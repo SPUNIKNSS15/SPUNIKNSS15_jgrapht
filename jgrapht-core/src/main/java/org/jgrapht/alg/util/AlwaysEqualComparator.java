@@ -20,7 +20,7 @@
  * the Eclipse Foundation.
  */
 /* -------------------------
- * DefaultComparator.java
+ * AlwaysEqualComparator.java
  * -------------------------
  * (C) Copyright 2015, by Fabian Späh and Contributors.
  *
@@ -34,16 +34,15 @@
  * 20-Jun-2015 : Initial revision (FS);
  *
  */
-package org.jgrapht.alg.isomorphism;
+package org.jgrapht.alg.util;
 
 import java.util.Comparator;
 
 
 /**
- * This is a default implementation for the check on semantic equality between
- * vertices or edges.
+ * A default implementation for a check on equality (that always holds)
  */
-public class DefaultComparator<T>
+public class AlwaysEqualComparator<T>
     implements Comparator<T>
 {
 
